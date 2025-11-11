@@ -1,0 +1,152 @@
+# creacion de pantalla en ionic- angular
+
+# COMPONENTES
+# PointCard.tsx
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-accounts-list',
+  templateUrl: './account-.component.html',
+  styleUrls: ['./account-history.component.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule]
+})
+export class PointCardComponent (
+  <ion-button fill="outline" color="medium" (click)="Buscar()">
+    <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+    Buscar
+  </ion-button>
+)
+
+
+# PointForm.tsx
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-accounts-list',
+  templateUrl: './account-.component.html',
+  styleUrls: ['./account-history.component.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule]
+})
+export class PointFormComponent (
+
+  <ion-content class="ion-padding">
+
+  <form (ngSubmit)="guardarCuenta()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input [(ngModel)]="nuevaCuenta.nombre" name="nombre" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Fecha</ion-label>
+      <ion-datetime display-format="YYYY-MM-DD" [(ngModel)]="nuevaCuenta.fecha" name="fecha" required></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descripción</ion-label>
+      <ion-textarea [(ngModel)]="nuevaCuenta.descripcion" name="descripcion" required></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Valor</ion-label>
+      <ion-input type="number" [(ngModel)]="nuevaCuenta.valor" name="valor" required></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" color="success" class="guardar-btn" (click)="guardarCuenta()">
+      Guardar Cuenta
+    </ion-button>
+  </form>
+ 
+)
+
+# PointsListView.tsx
+
+<ion-list *ngIf="cuentas && cuentas.length > 0; else sinCuentas">
+    <ion-item *ngFor="let cuenta of cuentas">
+      <ion-label>
+        <h2>{{ cuenta.nombre }}</h2>
+        <p><strong>Descripción:</strong> {{ cuenta.descripcion }}</p>
+        <p><strong>Fecha:</strong> {{ cuenta.fecha }}</p>
+        <p><strong>Valor:</strong> ${{ cuenta.valor | number:'1.2-2' }}</p>
+      </ion-label>
+
+### Para Mostrar listas
+
+<ion-list *ngIf="Tarjetasguardadas.length > 0" class="cuentas-list">
+    <ion-list-header>
+      <ion-label> Tarjetas Registaradas</ion-label>
+    </ion-list-header>
+
+# PointDetailView.tsx
+
+<ion-item *ngFor="let cuenta of cuentasGuardadas">
+      <ion-label>
+        <h2>{{ cuenta.nombre }}</h2>
+        <p><strong>Fecha:</strong> {{ cuenta.fecha }}</p>
+        <p><strong>Descripción:</strong> {{ cuenta.descripcion }}</p>
+        <p><strong>Valor:</strong> ${{ cuenta.valor }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+# pointsRoutes.tsx
+
+import { Routes } from '@angular/router';
+import { PointCardComponent } from './pages/PointCardComponent';
+import { PointFormComponent } from './pages/PointFormComponent';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '', pathMatch: 'full' },
+  { path: 'PointCard', component: PointCardComponent }
+  { path: 'PointForm', component: PointFormComponent }
+];
+
+
+# pointsService.ts
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class pointsService {
+  private readonly TOKEN_KEY = 'veridia_token';
+  private readonly USERS_KEY = 'veridia_users';
+
+  constructor() {}
+
+  async login(username: string, password: string): Promise<boolean> {
+    const users = this.getUsers();
+    const found = users.find(u => (u.email === username || u.nombre === username) && u.password === password);
+    if (found) {
+      localStorage.setItem(this.TOKEN_KEY, this.createFakeToken(found.email || found.nombre));
+      return true;
+    }
+    const valid = !!username && password && password.length >= 4;
+    if (valid) {
+      localStorage.setItem(this.TOKEN_KEY, this.createFakeToken(username));
+      return true;
+    }
+    return false;
+  }
+
+  async register(nombre: string, email: string, password: string): Promise<boolean> {
+    const users = this.getUsers();
+    if (users.some(u => u.email === email)) return false;
+    users.push({ nombre, email, password });
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+    return true;
+  }
+
+# pointsStyles.css
+
